@@ -66,7 +66,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
         holder.author.setText(mDataset.get(position).getAuthor());
         holder.date.setText(mDataset.get(position).getDate());
         holder.messageId.setText(""+mDataset.get(position).getMessageId());
-        holder.subject.setText("Subject:\t"+mDataset.get(position).getSubject());
+        holder.subject.setText(""+mDataset.get(position).getSubject());
         holder.link.setText(mDataset.get(position).getLink());
         holder.link.setText(mDataset.get(position).getFilename());
         final Animation upAnim = AnimationUtils.loadAnimation(context,R.anim.fromtop_translation);
@@ -104,7 +104,38 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
        delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                optionsMenu.show();
+                ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+                if(isConnected)
+                {
+                    String url = "http://doe.payghost.co.za/scripts/documents/"+holder.link.getText()+"";
+                    DownloadManager downloadManager = (DownloadManager) context.getSystemService(DOWNLOAD_SERVICE);
+                    Uri Download_Uri = Uri.parse(url);
+                    DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
+                    request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+                    //Set whether this download may proceed over a roaming connection.
+                    request.setAllowedOverRoaming(false);
+                    request.setTitle("Downloading");
+                    request.setDescription("Downloading File");
+                    request.allowScanningByMediaScanner();
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, holder.link.getText()+"");
+                    request.setVisibleInDownloadsUi(true);
+                    long downloadReference = downloadManager.enqueue(request);
+                }
+                else
+                {
+                    LayoutInflater infla = LayoutInflater.from(holder.itemView.getContext());
+                    View layout =infla.inflate(R.layout.toast_container_layout,(ViewGroup)holder.itemView.findViewById(R.id.toast_layout));
+                    TextView textview = (TextView)layout.findViewById(R.id.toast_message);
+                    textview.setText("No Internet Connection!");
+                    Toast toast = new Toast(context);
+                    toast.setGravity(Gravity.CENTER_VERTICAL,0,0);
+                    toast.setDuration(Toast.LENGTH_LONG);
+                    toast.setView(layout);
+                    toast.show();
+                }
             }
         });
         optionsMenu.getMenu().findItem(R.id.download_doc).setVisible(true);
@@ -159,7 +190,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
             @Override
             public void onClick(View view) {
                 holder.message.setMaxLines(50);
-               Toast.makeText(context,holder.link.getText().toString(),Toast.LENGTH_LONG).show();
             }
         });
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -191,12 +221,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
     }
     @Override
     public int getItemCount() {
-        return this.mDataset.size();
+        return mDataset.size();
     }
     public void removeItem(int position)
     {
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,mDataset.size());
+    }
+    public void addItems(String  subject,
+                         String date,String message,
+                         String  attach,String urgent,
+                         String author,String link,
+                         String filename) {
+        mDataset.add(0,new Items(0,subject,date,message,attach,urgent,author,link,filename));
+        notifyDataSetChanged();
     }
 }

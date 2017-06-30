@@ -33,13 +33,12 @@ public class PostJSONPaser {
                                     obj.getString("link").toString(),obj.getString("filename").toString());
                 itemList.add(items);
             }
-            return itemList;
 
         }
         catch (JSONException ex) {
             ex.printStackTrace();
-            return null;
         }
+        return itemList;
     }
 
 }

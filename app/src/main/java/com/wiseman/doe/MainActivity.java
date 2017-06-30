@@ -22,7 +22,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -34,6 +36,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -48,6 +51,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import net.gotev.uploadservice.MultipartUploadRequest;
 import net.gotev.uploadservice.UploadNotificationConfig;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,35 +61,47 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
-    MessageAdapter mAdapter;
+    public static MessageAdapter mAdapter;
     CardView sendmessage, upload;
-    TextView close, send, uploading, closeupload, filechoose;
+    TextView close, send, uploading, closeupload, filechoose,textError;
+    TextView pick;
+    TextView title;
+    TextView descr;
+    TextView sub;
+    TextView mess;
     EditText subject, message, description, doctitle;
     LinearLayout choose;
-    String urgent, token;
+    String urgentt, urgent, token;
     RequestQueue requestQueue;
     ProgressDialog myProgressDialog;
+    public static String username;
     private Uri filepath;
+    public static boolean active=true;
+    public static  CardView not;
     private final String UPLOAD_URL = "http://doe.payghost.co.za/scripts/upload.php";
     String uri = "http://doe.payghost.co.za/scripts/retrieve.php";
     List<Items> myDataset;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+;        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Department Of Education");
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-
         token = FirebaseInstanceId.getInstance().getToken();
         send();
         FirebaseMessaging.getInstance().subscribeToTopic("test");
-
+        textError = (TextView)findViewById(R.id.text_error);
         subject = (EditText) findViewById(R.id.subject_message);
         message = (EditText) findViewById(R.id.input_message);
         description = (EditText) findViewById(R.id.desc_doc);
         doctitle = (EditText) findViewById(R.id.title_doc);
+        pick = (TextView)findViewById(R.id.btn_choose);
+        title = (TextView)findViewById(R.id.write_title);
+        descr = (TextView)findViewById(R.id.write_description);
+        sub = (TextView)findViewById(R.id.write_subject);
+        mess = (TextView)findViewById(R.id.write_message);
 
         upload = (CardView) findViewById(R.id.upload);
         sendmessage = (CardView) findViewById(R.id.card);
@@ -103,6 +119,7 @@ public class MainActivity extends AppCompatActivity
         mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), mLayoutManager.getOrientation()));
+
         myProgressDialog = new ProgressDialog(MainActivity.this);
         myProgressDialog.show();
         myProgressDialog.setContentView(R.layout.progress);
@@ -124,7 +141,7 @@ public class MainActivity extends AppCompatActivity
                         layout.startAnimation(anim);
                         image.startAnimation(anim);
                         bar.startAnimation(anim);
-                        myProgressDialog.hide();
+                        myProgressDialog.dismiss();
                     }
                 },
 
@@ -134,7 +151,7 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 });
-        request.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(request);
 
@@ -161,7 +178,57 @@ public class MainActivity extends AppCompatActivity
                 urgent = adapterView.getItemAtPosition(0).toString();
             }
         });
+         subject.setOnTouchListener(new View.OnTouchListener() {
+             @Override
+             public boolean onTouch(View view, MotionEvent motionEvent) {
+                 sub.setVisibility(View.GONE);
+                 return false;
+             }
+         });
 
+        Spinner spinnerr = (Spinner) findViewById(R.id.spinner_doc);
+        ArrayAdapter<CharSequence> adapterr = ArrayAdapter.createFromResource(getApplicationContext(), R.array.urgent, R.layout.dropdown_items);
+        adapterr.setDropDownViewResource(R.layout.dropdown_items);
+        spinnerr.setAdapter(adapter);
+        spinnerr.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                urgentt = adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                urgentt = adapterView.getItemAtPosition(0).toString();
+            }
+        });
+        subject.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                sub.setVisibility(View.GONE);
+                return false;
+            }
+        });
+        message.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent){
+                mess.setVisibility(View.GONE);
+                return false;
+            }
+        });
+        doctitle.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                title.setVisibility(View.GONE);
+                return false;
+            }
+        });
+        description.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                descr.setVisibility(View.GONE);
+                return false;
+            }
+        });
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -170,6 +237,9 @@ public class MainActivity extends AppCompatActivity
                 sendmessage.startAnimation(upAnim);
                 subject.setText("");
                 message.setText("");
+
+                sub.setVisibility(View.GONE);
+                mess.setVisibility(View.GONE);
             }
         });
         closeupload.setOnClickListener(new View.OnClickListener() {
@@ -181,38 +251,106 @@ public class MainActivity extends AppCompatActivity
                 doctitle.setText("");
                 description.setText("");
                 filechoose.setText("No file chosen");
+
+                title.setVisibility(View.GONE);
+                descr.setVisibility(View.GONE);
+                pick.setBackgroundResource(R.drawable.folder);
             }
         });
         uploading.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                upload(doctitle.getText().toString(), token);
-                upload.setVisibility(View.INVISIBLE);
-                final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_down);
-                upload.startAnimation(upAnim);
+                username = getIntent().getExtras().getString("username");
+                String titleDoc = doctitle.getText().toString();
+                String descript =  description.getText().toString();
+                TextView text = (TextView)findViewById(R.id.title_choose);
+                if(titleDoc.isEmpty()||descript.isEmpty()||!(text.getText().toString().indexOf(".")>0))
+                {
+                    final Animation textAnim = new AlphaAnimation(0.0f,1.0f);
+
+                    textAnim.setDuration(50);
+                    textAnim.setStartOffset(20);
+                    textAnim.setRepeatMode(Animation.REVERSE);
+                    textAnim.setRepeatCount(6);
+                    if(!(text.getText().toString().indexOf(".")>0))
+                    {
+                        pick.setBackgroundResource(R.drawable.errorfolder);
+                        pick.startAnimation(textAnim);
+                    }
+
+                    if(titleDoc.isEmpty())
+                    {
+                        title.setVisibility(View.VISIBLE);
+                        title.startAnimation(textAnim);
+                    }
+                    if(descript.isEmpty())
+                    {
+                        descr.setVisibility(View.VISIBLE);
+                        descr.startAnimation(textAnim);
+                    }
+                }
+                else
+                {
+                    upload(titleDoc ,descript);
+                    upload.setVisibility(View.INVISIBLE);
+                    final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_down);
+                    upload.startAnimation(upAnim);
+                }
 
             }
         });
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendMessage(subject.getText().toString(), message.getText().toString());
-                sendmessage.setVisibility(View.INVISIBLE);
-                final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_down);
-                sendmessage.startAnimation(upAnim);
-                subject.setText("");
-                message.setText("");
-                myProgressDialog = new ProgressDialog(MainActivity.this);
-                myProgressDialog.show();
-                myProgressDialog.setContentView(R.layout.progress);
-                ProgressBar progressBar = (ProgressBar) myProgressDialog.findViewById(R.id.progressBar);
-                progressBar.getIndeterminateDrawable()
-                        .setColorFilter(Color.parseColor("#00FF00"), PorterDuff.Mode.MULTIPLY);
+                username = getIntent().getExtras().getString("username");
+                String messageSubject = subject.getText().toString();
+                String messageText =  message.getText().toString();
+                if(messageSubject.isEmpty() || messageText.isEmpty())
+                {
+                    final Animation textAnim = new AlphaAnimation(0.0f,1.0f);
+                    textAnim.setDuration(50);
+                    textAnim.setStartOffset(20);
+                    textAnim.setRepeatMode(Animation.REVERSE);
+                    textAnim.setRepeatCount(6);
+
+                    if(messageSubject.isEmpty())
+                    {
+                        sub.setVisibility(View.VISIBLE);
+                        sub.startAnimation(textAnim);
+                    }
+                    if(messageText.isEmpty()) {
+                        mess.setVisibility(View.VISIBLE);
+                        mess.startAnimation(textAnim);
+                    }
+
+                }
+                else
+                {
+
+
+                    sendMessage(messageSubject, messageText);
+                    sendmessage.setVisibility(View.INVISIBLE);
+                    final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_down);
+                    sendmessage.startAnimation(upAnim);
+
+                    sub.setVisibility(View.GONE);
+                    mess.setVisibility(View.GONE);
+                    subject.setText("");
+                    message.setText("");
+
+                    myProgressDialog = new ProgressDialog(MainActivity.this);
+                    myProgressDialog.show();
+                    myProgressDialog.setContentView(R.layout.progress);
+                    ProgressBar progressBar = (ProgressBar) myProgressDialog.findViewById(R.id.progressBar);
+                    progressBar.getIndeterminateDrawable()
+                            .setColorFilter(Color.parseColor("#00FF00"), PorterDuff.Mode.MULTIPLY);
+                }
             }
         });
         choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pick.setBackgroundResource(R.drawable.folder);
                 Intent intent = new Intent();
                 intent.setType("*/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -239,15 +377,22 @@ public class MainActivity extends AppCompatActivity
             sendmessage.setVisibility(View.GONE);
             final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_down);
             sendmessage.startAnimation(upAnim);
+
             subject.setText("");
             message.setText("");
+            sub.setVisibility(View.GONE);
+            mess.setVisibility(View.GONE);
+
         } else if (upload.getVisibility() == View.VISIBLE) {
             upload.setVisibility(View.GONE);
             final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_down);
             upload.startAnimation(upAnim);
+
             doctitle.setText("");
             description.setText("");
             filechoose.setText("No file chosen");
+            pick.setBackgroundResource(R.drawable.folder);
+
         } else {
             super.onBackPressed();
         }
@@ -268,9 +413,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            // return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -303,7 +446,9 @@ public class MainActivity extends AppCompatActivity
                     .setCancelable(false)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            System.exit(0);
+                            Intent mainIntent = new Intent(getApplicationContext(),Login.class);
+                            MainActivity.this.startActivity(mainIntent);
+                            MainActivity.this.finish();
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -319,6 +464,11 @@ public class MainActivity extends AppCompatActivity
                 final Animation downAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_right);
                 sendmessage.setVisibility(View.GONE);
                 sendmessage.startAnimation(downAnim);
+
+                mess.setVisibility(View.GONE);
+                sub.setVisibility(View.GONE);
+                subject.setText("");
+                message.setText("");
             }
             final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate);
             upload.setVisibility(View.VISIBLE);
@@ -329,6 +479,13 @@ public class MainActivity extends AppCompatActivity
                 final Animation downAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate_right);
                 upload.setVisibility(View.GONE);
                 upload.startAnimation(downAnim);
+
+                title.setVisibility(View.GONE);
+                descr.setVisibility(View.GONE);
+                doctitle.setText("");
+                description.setText("");
+                pick.setBackgroundResource(R.drawable.folder);
+
             }
             final Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate);
             sendmessage.setVisibility(View.VISIBLE);
@@ -338,6 +495,30 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        active=false;
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        active=true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onStart() {
+        active=true;
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        active=false;
+        super.onStop();
     }
 
     @Override
@@ -368,8 +549,7 @@ public class MainActivity extends AppCompatActivity
                 return parameters;
             }
         };
-        request.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));        requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(request);
     }
 
@@ -378,11 +558,12 @@ public class MainActivity extends AppCompatActivity
         int hours = dt.getHours();
         int minutes = dt.getMinutes();
         final String time = hours + ":" + minutes;
-        String insertUrl = "http://doe.payghost.co.za/scripts/send.php";
+        String insertUrl = "http://doe.payghost.co.za/scripts/upload.php";
         StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-
+                myProgressDialog.dismiss();
+                Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -394,21 +575,21 @@ public class MainActivity extends AppCompatActivity
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("subject", subjectMessage);
-                parameters.put("message", messageMessage);
-                parameters.put("time", time);
-                parameters.put("attachment", "no");
-                parameters.put("urgent", urgent);
-                parameters.put("username", "Wiseman");
+                parameters.put("subject",subjectMessage);
+                parameters.put("message",messageMessage);
+                parameters.put("time",time);
+                parameters.put("attachment","no");
+                parameters.put("urgent",urgent);
+                parameters.put("username",username);
                 return parameters;
             }
         };
-        request.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        request.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(request);
     }
 
-    public void upload(String title, String desc) {
+    public void upload(String titleMessage, String desc) {
         Date dt = new Date();
         int hours = dt.getHours();
         int minutes = dt.getMinutes();
@@ -416,21 +597,34 @@ public class MainActivity extends AppCompatActivity
         try {
             new MultipartUploadRequest(getApplicationContext(), UPLOAD_URL)
                     .addFileToUpload(filepath.getPath().toString(), "uploaded_file")
-                    .addParameter("title", title)
-                    .addParameter("description", desc)
+                    .addParameter("subject",titleMessage)
+                    .addParameter("message",desc)
                     .addParameter("attachment", "yes")
-                    .addParameter("urgent", "no")
-                    .addParameter("username", "Wiseman")
+                    .addParameter("urgent", urgentt)
+                    .addParameter("username",username)
                     .addParameter("time", time)
                     .setMethod("POST")
                     .setNotificationConfig(new UploadNotificationConfig())
                     .setMaxRetries(1)
                     .startUpload();
         } catch (Exception ex) {
-
+            Toast.makeText(getApplicationContext(),ex.getMessage().toString(),Toast.LENGTH_LONG).show();
         }
         doctitle.setText("");
         description.setText("");
         filechoose.setText("No file chosen");
+        title.setVisibility(View.GONE);
+        descr.setVisibility(View.GONE);
+        pick.setBackgroundResource(R.drawable.folder);
+    }
+    private List<Items> additem(int messageId,String  subject,
+                                String date,String message,
+                                String  attach,String urgent,
+                                String author,String link  ,
+                                String filename)
+    {
+        List<Items> itemsList = new ArrayList<Items>();
+        itemsList.add(new Items(messageId,subject,date,message,attach,urgent,author,link,filename));
+        return itemsList;
     }
 }

@@ -52,6 +52,13 @@
                         android:background="@drawable/close"
                         android:layout_gravity="left"/>
                     <TextView
+                        android:id="@+id/text_error"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text=""
+                        android:textColor="#FF00"
+                        android:layout_gravity="center" />
+                    <TextView
                         android:id="@+id/sending"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
@@ -70,7 +77,8 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:paddingBottom="0dp">
-                <LinearLayout
+                <FrameLayout
+                    android:orientation="horizontal"
                     android:id="@+id/subject_layout"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
@@ -81,6 +89,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
+                        android:layout_gravity="left"
                         android:layout_marginBottom="8dp">
                         <EditText android:id="@+id/subject_message"
                             android:layout_width="match_parent"
@@ -89,7 +98,15 @@
                             android:inputType="textPersonName"
                             android:hint="Subject..."/>
                     </android.support.design.widget.TextInputLayout>
-                </LinearLayout>
+                    <TextView
+                        android:id="@+id/write_subject"
+                        android:visibility="gone"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/hand"
+                        android:layout_marginTop="@dimen/activity_horizontal_margin"
+                        android:layout_gravity="right" />
+                </FrameLayout>
                 <LinearLayout
                     android:id="@+id/urgent_layout"
                     android:layout_height="wrap_content"
@@ -113,17 +130,19 @@
 
                     </android.support.v7.widget.AppCompatSpinner>
                 </LinearLayout>
-                <LinearLayout
+                <FrameLayout
                     android:id="@+id/input_layout"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_below="@+id/urgent_layout"
                     android:paddingLeft="2dp"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="8dp"
+                    android:orientation="horizontal">
                     <android.support.design.widget.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp">
+                        android:layout_gravity="left"
+                        android:layout_marginTop="2dp">
                         <EditText android:id="@+id/input_message"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -133,7 +152,15 @@
                             android:minLines="0"
                             android:hint="Type your message..." />
                     </android.support.design.widget.TextInputLayout>
-                </LinearLayout>
+                    <TextView
+                        android:id="@+id/write_message"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:visibility="gone"
+                        android:layout_marginTop="@dimen/activity_horizontal_margin"
+                        android:background="@drawable/hand"
+                        android:layout_gravity="right"/>
+                </FrameLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

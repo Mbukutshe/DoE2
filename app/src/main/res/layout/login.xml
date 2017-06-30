@@ -23,7 +23,7 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
-        <ImageView android:src="@drawable/edu"
+        <ImageView android:src="@drawable/edulogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
@@ -39,10 +39,14 @@
             android:layout_marginBottom="24dp"
             android:paddingRight="56dp"/>
         <!--  Name Label -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/frame_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="2dp"
             android:layout_marginBottom="8dp">
 
             <EditText android:id="@+id/input_username"
@@ -52,13 +56,25 @@
                 android:inputType="textCapWords"
                 android:hint="Username" />
         </android.support.design.widget.TextInputLayout>
-
+            <TextView
+                android:id="@+id/write_username"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:background="@drawable/hand"
+                android:layout_gravity="right"/>
+        </FrameLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <!-- Password Label -->
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/frame_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="2dp">
 
             <EditText
                 android:id="@+id/input_password"
@@ -68,7 +84,15 @@
                 android:inputType="textPassword"
                 android:textColor="@color/colorPrimary" />
         </android.support.design.widget.TextInputLayout>
-
+            <TextView
+                android:id="@+id/write_password"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:background="@drawable/hand"
+                android:layout_gravity="right"/>
+        </FrameLayout>
         <!-- Signup Button -->
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_login"
@@ -123,7 +147,7 @@
                     android:layout_height="20dp"
                     android:textColor="@drawable/button_selector"
                     android:background="@drawable/atemail"
-                    android:layout_gravity="left|center_vertical" />
+                    android:layout_gravity="left|center_vertical"/>
                 <EditText
                     android:id="@+id/email"
                     android:layout_width="match_parent"
