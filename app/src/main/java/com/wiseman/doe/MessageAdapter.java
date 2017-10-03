@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,16 +36,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
     List<Items> mDataset;
     Context context,c;
     RecyclerView recyclerView;
-    FloatingActionButton fab;
     LinearLayoutManager layoutManager;
     private static int firstVisibleInListview;
-    public MessageAdapter(Context context, List<Items> mDataset, RecyclerView recyclerView, FloatingActionButton fab, LinearLayoutManager layoutManager) {
+    int count=0;
+    LinearLayout empty;
+    TextView icon,icon_message;
+    public MessageAdapter(Context context, List<Items> mDataset, RecyclerView recyclerView, LinearLayoutManager layoutManager, LinearLayout empty,TextView icon,TextView iconMessage) {
         this.mDataset = mDataset;
         this.context=context;
         this.recyclerView = recyclerView;
-        this.fab = fab;
         this.layoutManager = layoutManager;
         firstVisibleInListview = layoutManager.findFirstVisibleItemPosition();
+        this.empty = empty;
+        this.icon=icon;
+        this.icon_message = iconMessage;
     }
 
     @Override
@@ -61,19 +65,30 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
 
     @Override
     public void onBindViewHolder(final MessageHolder holder, final int position) {
-
-        holder.message.setText(mDataset.get(position).getMessage());
-        holder.author.setText(mDataset.get(position).getAuthor());
-        holder.date.setText(mDataset.get(position).getDate());
-        holder.messageId.setText(""+mDataset.get(position).getMessageId());
-        holder.subject.setText(""+mDataset.get(position).getSubject());
-        holder.link.setText(mDataset.get(position).getLink());
-        holder.link.setText(mDataset.get(position).getFilename());
+        if (mDataset.get(position).getAttach().toString().equalsIgnoreCase("no")) {
+            holder.message.setText(mDataset.get(position).getMessage());
+            holder.author.setText(mDataset.get(position).getAuthor());
+            holder.date.setText(mDataset.get(position).getDate());
+            holder.subject.setText("" + mDataset.get(position).getSubject());
+            holder.link.setText(mDataset.get(position).getLink());
+            holder.filename.setText(mDataset.get(position).getFilename());
+            count++;
+        }
+        if(count>0)
+        {
+            recyclerView.setVisibility(View.VISIBLE);
+            empty.setVisibility(View.GONE);
+        }
+        else
+        {
+            recyclerView.setVisibility(View.GONE);
+            empty.setVisibility(View.VISIBLE);
+            icon.setBackgroundResource(R.drawable.nomessages);
+            icon_message.setText("No Messages To Show");
+        }
         final Animation upAnim = AnimationUtils.loadAnimation(context,R.anim.fromtop_translation);
         holder.itemView.clearAnimation();
         holder.itemView.startAnimation(upAnim);
-        final Animation Anim = AnimationUtils.loadAnimation(context,R.anim.rotate);
-        final Animation antiRotate = AnimationUtils.loadAnimation(context,R.anim.anti_rotate);
 
         ImageView delete = (ImageView)holder.itemView.findViewById(R.id.delete_message);
         Context popup = new ContextThemeWrapper(c,R.style.popup);
@@ -81,17 +96,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
         MenuInflater inflater = optionsMenu.getMenuInflater();
         inflater.inflate(R.menu.operation_menu,optionsMenu.getMenu());
 
-        if(mDataset.get(position).getAttach().toString().equalsIgnoreCase("yes"))
-        {
-            holder.attach.setVisibility(View.VISIBLE);
-            holder.delete.setVisibility(View.VISIBLE);
+        holder.attach.setVisibility(View.GONE);
+        holder.delete.setVisibility(View.GONE);
 
-        }
-        else
-        {
-            holder.attach.setVisibility(View.GONE);
-            holder.delete.setVisibility(View.GONE);
-        }
         if(mDataset.get(position).getUrgent().toString().equalsIgnoreCase("yes"))
         {
             holder.urgent.setBackgroundResource(R.drawable.important);
@@ -192,32 +199,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
                 holder.message.setMaxLines(50);
             }
         });
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                holder.message.setLines(1);
-            }
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                holder.message.setLines(1);
-
-                int currentFirstVisible = layoutManager.findFirstVisibleItemPosition();
-
-                if(currentFirstVisible > firstVisibleInListview)
-                {
-                    fab.startAnimation(Anim);
-                }
-                else
-                    if(currentFirstVisible <firstVisibleInListview)
-                    {
-                        fab.startAnimation(antiRotate);
-                    }
-
-                firstVisibleInListview = currentFirstVisible;
-            }
-        });
     }
     @Override
     public int getItemCount() {
@@ -228,13 +209,5 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageHolder>{
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,mDataset.size());
-    }
-    public void addItems(String  subject,
-                         String date,String message,
-                         String  attach,String urgent,
-                         String author,String link,
-                         String filename) {
-        mDataset.add(0,new Items(0,subject,date,message,attach,urgent,author,link,filename));
-        notifyDataSetChanged();
     }
 }

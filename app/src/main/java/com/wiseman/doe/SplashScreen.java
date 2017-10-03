@@ -22,7 +22,7 @@ public class SplashScreen extends AppCompatActivity {
          * and close this Splash-Screen after some seconds.*/
         ImageView logo= (ImageView)findViewById(R.id.splash_logo);
         final Animation zoomRotate = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.zoom);
-        logo.startAnimation(zoomRotate);
+       // logo.startAnimation(zoomRotate);
 
         Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
         upAnim.reset();
@@ -32,18 +32,17 @@ public class SplashScreen extends AppCompatActivity {
 
         //upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.translate);
 
-
         final Animation fadeIn = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_in);
+        logo.startAnimation(fadeIn);
         final Animation fadeOut = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_out);
         logo.startAnimation(upAnim);
         logo.clearAnimation();
-        logo.startAnimation(zoomRotate);
-        zoomRotate.setAnimationListener(new Animation.AnimationListener() {
+       /// logo.startAnimation(zoomRotate);
+        upAnim.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
 
             }
-
             @Override
             public void onAnimationEnd(Animation animation) {
                 layout.setAnimation(fadeOut);

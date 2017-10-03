@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DoE App</string>
+    <string name="app_name">North Durban West Circuit</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -10,5 +10,29 @@
     <string-array name ="urgent">
         <item>Yes</item>
         <item>No</item>
+    </string-array>
+    <string-array name ="title">
+        <item>Select the title...</item>
+        <item>Mr.</item>
+        <item>Mrs.</item>
+        <item>Ms.</item>
+        <item>Dr.</item>
+        <item>Prof.</item>
+    </string-array>
+    <string-array name ="category">
+        <item>All</item>
+        <item>District 1</item>
+        <item>District 2</item>
+        <item>District 3</item>
+        <item>District 4</item>
+        <item>District 5</item>
+    </string-array>
+    <string-array name ="district">
+        <item>Select the district...</item>
+        <item>District 1</item>
+        <item>District 2</item>
+        <item>District 3</item>
+        <item>District 4</item>
+        <item>District 5</item>
     </string-array>
 </resources>

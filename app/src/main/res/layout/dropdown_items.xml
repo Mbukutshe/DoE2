@@ -3,8 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textColor="@color/colorPrimary"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_horizontal_margin">
+    android:paddingTop="0dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="40dp"
+    android:paddingBottom="10dp"
+    android:textSize="7pt"
+    android:textColor="@color/colorPrimary">
 </CheckedTextView>

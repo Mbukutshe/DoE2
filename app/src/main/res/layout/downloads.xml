@@ -7,7 +7,7 @@
     android:id="@+id/card"
     android:layout_height="wrap_content"
     android:visibility="gone"
-    card_view:cardBackgroundColor="#EAEAEA"
+    card_view:cardBackgroundColor="#FAFAFA"
     android:background="#EAEAEA"
     card_view:cardElevation="5dp"
     card_view:cardCornerRadius="20dp"
@@ -23,7 +23,7 @@
     <ScrollView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:background="#EAEAEA"
+        android:background="#FAFAFA"
         android:layout_gravity="bottom|center"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="20dp"
@@ -107,29 +107,76 @@
                         android:layout_marginTop="@dimen/activity_horizontal_margin"
                         android:layout_gravity="right" />
                 </FrameLayout>
-                <LinearLayout
+                <FrameLayout
+                    android:orientation="horizontal"
                     android:id="@+id/urgent_layout"
                     android:layout_height="wrap_content"
                     android:layout_width="match_parent"
                     android:layout_below="@+id/subject_layout"
                     android:paddingLeft="2dp"
                     android:layout_marginBottom="8dp">
-                    <TextView
-                        android:id="@+id/urgent_message"
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_toRightOf="@+id/spinner"
-                        android:text="Urgent:"
-                        android:inputType="textPersonName"
-                        android:textAppearance="@style/network_style"/>
-                    <android.support.v7.widget.AppCompatSpinner
-                        android:id="@+id/spinner"
+                        android:layout_gravity="left"
+                        android:paddingLeft="2dp">
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="left">
+                            <TextView
+                                android:id="@+id/urgent_message"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_toRightOf="@+id/spinner"
+                                android:text="Urgent:"
+                                android:inputType="textPersonName"
+                                android:textAppearance="@style/network_style"/>
+                        </FrameLayout>
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right">
+                            <android.support.v7.widget.AppCompatSpinner
+                                android:id="@+id/spinner"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:theme="@style/SpinnerAppTheme"/>
+                        </FrameLayout>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_toLeftOf="@+id/urgent_message">
+                        android:layout_gravity="right"
+                        android:paddingLeft="2dp">
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="left">
+                            <TextView
+                                android:id="@+id/category"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_toRightOf="@+id/spinner"
+                                android:text="Category:"
+                                android:inputType="textPersonName"
+                                android:textAppearance="@style/network_style"/>
+                        </FrameLayout>
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="right">
+                            <android.support.v7.widget.AppCompatSpinner
+                                android:id="@+id/spinner_category"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:theme="@style/SpinnerAppTheme"/>
+                        </FrameLayout>
+                    </LinearLayout>
+                </FrameLayout>
 
-                    </android.support.v7.widget.AppCompatSpinner>
-                </LinearLayout>
                 <FrameLayout
                     android:id="@+id/input_layout"
                     android:layout_height="wrap_content"

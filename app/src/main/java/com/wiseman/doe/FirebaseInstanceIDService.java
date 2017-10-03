@@ -37,29 +37,6 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService
             e.printStackTrace();
         }
 
-    /*    String insertUrl = "http://doe.payghost.co.za/scripts/register.php";
-        StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Toast.makeText(getApplicationContext(),"Response:"+response,Toast.LENGTH_LONG).show();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"Error : "+error,Toast.LENGTH_LONG).show();
-            }
-
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("Token", token);
-                return parameters;
-            }
-        };
-        request.setRetryPolicy(new DefaultRetryPolicy(0, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
-        requestQueue.add(request);*/
 
     }
 }

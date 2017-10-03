@@ -49,4 +49,17 @@
     <style name="popup" parent="@android:style/Widget.PopupMenu">
         <item name="android:textColor">@color/menuColor</item>
     </style>
+    <style name="Spinner" parent="@style/Widget.AppCompat.Spinner">
+        <item name="android:background">@drawable/dropdown_selector</item>
+        <item name="android:color">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+    <style name="SpinnerAppTheme" parent="@style/TextInputThemeLayout">
+        <item name="spinnerStyle">@style/Spinner</item>
+    </style>
+    <style name="TextInputThemeLayout" parent="@style/AppTheme">
+        <item name="colorControlNormal">#EFEFEF</item>
+        <item name="colorControlActivated">#EFEFEF</item>
+    </style>
+
 </resources>

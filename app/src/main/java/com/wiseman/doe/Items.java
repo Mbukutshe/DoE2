@@ -5,7 +5,7 @@ package com.wiseman.doe;
  */
 
 public class Items {
-    private int messageId;
+
     private String message;
     private String subject;
     private String link;
@@ -14,13 +14,12 @@ public class Items {
     private String filename;
     private String urgent;
     private String attach;
-    public Items(int messageId,String  subject,
+    public Items(String  subject,
                  String date,String message,
                  String  attach,String urgent,
                  String author,String link  ,
                  String filename)
     {
-        this.messageId=messageId;
         this.message = message;
         this.subject = subject;
         this.link = link;
@@ -31,14 +30,6 @@ public class Items {
         this.setAttach(attach);
     }
 
-    public int getMessageId()
-    {
-        return messageId;
-    }
-    public void setMessageId(int messageId)
-    {
-        this.messageId = messageId;
-    }
     public String getMessage()
     {
         return message;

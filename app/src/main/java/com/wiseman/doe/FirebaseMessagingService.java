@@ -10,9 +10,6 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService
 {
     @Override
@@ -37,8 +34,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         globalVariables.filenames =filename;
         globalVariables.urgents = urgent;
         globalVariables.attachs = attach;
-        List<Items> itemsList = additem(0,globalVariables.subjects,globalVariables.dates,globalVariables.messages,
-                globalVariables.attachs,globalVariables.urgents,globalVariables.authors,globalVariables.links,globalVariables.filenames);
+
         try
         {
             Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -60,15 +56,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             manager.notify(0,builder.build());
 
     }
-    private List<Items> additem(int messageId,String  subject,
-                                String date,String message,
-                                String  attach,String urgent,
-                                String author,String link  ,
-                                String filename)
-    {
-        List<Items> itemsList = new ArrayList<Items>();
-        itemsList.add(new Items(messageId,subject,date,message,attach,urgent,author,link,filename));
-        return itemsList;
-    }
+
 
 }
