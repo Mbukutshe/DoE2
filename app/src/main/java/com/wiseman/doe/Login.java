@@ -11,10 +11,13 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -23,6 +26,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,13 +39,18 @@ import java.util.Map;
  */
 
 public class Login extends AppCompatActivity {
-    EditText username,password;
+    EditText username,password,forgotten_username,forgottern_email,forgotten_cell;
+    FrameLayout back,send,forgotten;
+    LinearLayout login_layout;
     TextInputLayout userframe,passframe;
     String user,pass;
-    TextView errorMessage,writeUsername,writePassword;
+    TextView errorMessage,writeUsername,writePassword,write_user,write_cell,write_email;
     AppCompatButton login;
     RelativeLayout log;
     RequestQueue requestQueue;
+    Animation upAnim;
+    String access,privileges="";
+    ScrollView scrollView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +66,21 @@ public class Login extends AppCompatActivity {
         userframe = (TextInputLayout)findViewById(R.id.frame_username);
         passframe = (TextInputLayout)findViewById(R.id.frame_password);
 
-        Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.translate);
+        back = (FrameLayout)findViewById(R.id.back);
+        send = (FrameLayout)findViewById(R.id.send_forgotten);
+        forgotten = (FrameLayout)findViewById(R.id.frame_forgotten);
+        forgotten_username = (EditText)findViewById(R.id.input_user);
+        forgotten_cell = (EditText)findViewById(R.id.input_cell);
+        forgottern_email = (EditText)findViewById(R.id.input_email);
+        write_user = (TextView)findViewById(R.id.write_user);
+        write_cell = (TextView)findViewById(R.id.write_cell);
+        write_email = (TextView)findViewById(R.id.write_cell);
+        login_layout = (LinearLayout)findViewById(R.id.login_layout);
+        scrollView = (ScrollView)findViewById(R.id.scrollView);
+        scrollView.getBackground().setAlpha(235);
+        forgotten.getBackground().setAlpha(180);
+
+                upAnim= AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
         log.startAnimation(upAnim);
         username.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -112,38 +137,57 @@ public class Login extends AppCompatActivity {
             }
         });
         final CardView recovery = (CardView)findViewById(R.id.recovery);
-        final CardView emailRecovery = (CardView)findViewById(R.id.tooltip);
+        recovery.getBackground().setAlpha(150);
         recovery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                emailRecovery.setVisibility(View.VISIBLE);
-                recovery.setVisibility(View.GONE);
+                upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
+                login_layout.setVisibility(View.GONE);
+                forgotten.startAnimation(upAnim);
+                forgotten.setVisibility(View.VISIBLE);
             }
         });
-        Button sending = (Button)findViewById(R.id.sending);
-        sending.setOnClickListener(new View.OnClickListener() {
+        upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recovery.setVisibility(View.VISIBLE);
-                emailRecovery.setVisibility(View.INVISIBLE);
+                back.startAnimation(upAnim);
+                upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
+                forgotten.setVisibility(View.GONE);
+                login_layout.setVisibility(View.VISIBLE);
+                login_layout.startAnimation(upAnim);
+            }
+        });
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
+                send.startAnimation(upAnim);
             }
         });
     }
     public void login(final String username, final String password)
     {
-        String insertUrl = "http://doe.payghost.co.za/scripts/getIn.php";
-        StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, globalVariables.LOGIN_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if(response.equalsIgnoreCase("granted"))
-                {
-                    Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
-                    mainIntent.putExtra("username",username);
-                    Login.this.startActivity(mainIntent);
-                    Login.this.finish();
-                }
-                else
-                    if(response.equalsIgnoreCase("denied"))
+
+                try {
+
+                    JSONObject obj = new JSONObject(response);
+                    access = obj.getString("access");
+                    privileges = obj.getString("privileges");
+
+                    if(access.equalsIgnoreCase("granted"))
+                    {
+                        Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
+                        mainIntent.putExtra("username",username);
+                        mainIntent.putExtra("privileges",privileges);
+                        Login.this.startActivity(mainIntent);
+                        Login.this.finish();
+                    }
+                    else
+                    if(access.equalsIgnoreCase("denied"))
                     {
                         final Animation textAnim = new AlphaAnimation(0.0f,1.0f);
                         textAnim.setDuration(50);
@@ -153,6 +197,11 @@ public class Login extends AppCompatActivity {
                         errorMessage.setText("Incorrect Username or Password!");
                         errorMessage.startAnimation(textAnim);
                     }
+                }
+                catch (JSONException ex) {
+                    Toast.makeText(getApplication(),ex.getMessage().toString(),Toast.LENGTH_LONG).show();
+                }
+
             }
         }, new Response.ErrorListener() {
             @Override

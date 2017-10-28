@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 public class SplashScreen extends AppCompatActivity {
@@ -21,15 +22,13 @@ public class SplashScreen extends AppCompatActivity {
         /* New Handler to start the Menu-Activity
          * and close this Splash-Screen after some seconds.*/
         ImageView logo= (ImageView)findViewById(R.id.splash_logo);
-        final Animation zoomRotate = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.zoom);
-       // logo.startAnimation(zoomRotate);
-
-        Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.alpha);
+        Animation upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_in);
         upAnim.reset();
         final RelativeLayout layout = (RelativeLayout) findViewById(R.id.splash_layout);
         layout.clearAnimation();
         layout.setAnimation(upAnim);
-
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.splash_icon_layout);
+        linearLayout.getBackground().setAlpha(220);
         //upAnim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.translate);
 
         final Animation fadeIn = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_in);

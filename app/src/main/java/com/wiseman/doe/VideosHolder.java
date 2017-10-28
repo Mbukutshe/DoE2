@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ public class VideosHolder extends RecyclerView.ViewHolder{
     RelativeLayout card;
     ImageView video_thumbnail;
     FrameLayout play,duration;
+    LinearLayout video_footer;
     public VideosHolder(View tv) {
         super(tv);
         video_thumbnail = (ImageView)tv.findViewById(R.id.video_thumbnail);
@@ -31,5 +33,7 @@ public class VideosHolder extends RecyclerView.ViewHolder{
         play = (FrameLayout)tv.findViewById(R.id.play_video_layout);
         duration = (FrameLayout)tv.findViewById(R.id.video_duration_layout);
         video_duration = (TextView)tv.findViewById(R.id.video_duration);
+        video_footer = (LinearLayout)tv.findViewById(R.id.video_footer_layout);
+
     }
 }

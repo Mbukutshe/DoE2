@@ -27,7 +27,7 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService
     {
         OkHttpClient client = new OkHttpClient();
         RequestBody body = new FormBody.Builder().add("Token",token).build();
-        Request request = new Request.Builder().url("http://doe.payghost.co.za/scripts/register.php").post(body).build();
+        Request request = new Request.Builder().url(globalVariables.REGISTER_DEVICE_URL).post(body).build();
         try
         {
             client.newCall(request).execute();
@@ -36,7 +36,5 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService
         {
             e.printStackTrace();
         }
-
-
     }
 }

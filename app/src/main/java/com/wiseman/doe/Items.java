@@ -1,11 +1,14 @@
 package com.wiseman.doe;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Wiseman on 2017-05-12.
  */
 
 public class Items {
-
+    private Bitmap image;
+    private String duration;
     private String message;
     private String subject;
     private String link;
@@ -14,11 +17,7 @@ public class Items {
     private String filename;
     private String urgent;
     private String attach;
-    public Items(String  subject,
-                 String date,String message,
-                 String  attach,String urgent,
-                 String author,String link  ,
-                 String filename)
+    public Items(String subject,String date,String message,String attach,String urgent,String author,String link,String filename)
     {
         this.message = message;
         this.subject = subject;
@@ -29,7 +28,31 @@ public class Items {
         this.urgent =urgent;
         this.setAttach(attach);
     }
-
+    public Items(Bitmap image,String duration,String subject,String date,String message,String attach,String urgent,String author,String link,String filename)
+    {
+        this.message = message;
+        this.subject = subject;
+        this.link = link;
+        this.author = author;
+        this.date = date;
+        this.filename =filename;
+        this.urgent =urgent;
+        this.setAttach(attach);
+        this.image = image;
+        this.duration = duration;
+    }
+    public Bitmap getImage() {
+        return image;
+    }
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+    public String getDuration() {
+        return duration;
+    }
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
     public String getMessage()
     {
         return message;

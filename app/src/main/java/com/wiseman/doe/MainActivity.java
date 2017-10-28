@@ -1,11 +1,15 @@
 package com.wiseman.doe;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -64,27 +68,26 @@ public class MainActivity extends AppCompatActivity
     RecyclerView mRecyclerView;
     LinearLayoutManager mLayoutManager;
     public static MessageAdapter mAdapter;
-    CardView sendmessage, upload,video_upload;
-    TextView close, send, uploading, closeupload, filechoose,textError,close_video,video_title_hand,video_desc_hand;
+    CardView sendmessage,upload,video_upload;
+    TextView close,send,uploading,closeupload,filechoose,textError,close_video,video_title_hand,video_desc_hand;
     TextView pick,btn_video_choose,title_choose_video,upload_video;
     TextView title;
     TextView descr;
     TextView sub;
     TextView mess,icon_message,icon;
-    EditText subject, message, description, doctitle,video_title,video_desc;
+    EditText subject,message,description,doctitle,video_title,video_desc;
     LinearLayout choose,signOut,help,choose_video,empty;
-    String urgentt, urgent, token;
+    String urgentt,urgent,token;
     RequestQueue requestQueue;
     ProgressDialog myProgressDialog;
-    public static String username;
+    public static String username,privileges;
     private Uri filepath;
     FloatingActionButton fab;
     public static boolean active=true;
     public static  CardView not;
-    private final String UPLOAD_URL = "http://doe.payghost.co.za/scripts/upload.php";
-    String uri = "http://doe.payghost.co.za/scripts/retrieve.php";
-    List<Items> myDataset;
+    public static List<Items> myDataset;
     public static final int Video_Selector=333;
+    FragmentManager fragmentManager;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -93,10 +96,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Messages");
-         fab = (FloatingActionButton) findViewById(R.id.fab);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         token = FirebaseInstanceId.getInstance().getToken();
         send();
         FirebaseMessaging.getInstance().subscribeToTopic("test");
+        registerReceiver(myReceiver,new IntentFilter(FirebaseMessagingService.INTENT_FILTER));
         textError = (TextView)findViewById(R.id.text_error);
         subject = (EditText) findViewById(R.id.subject_message);
         message = (EditText) findViewById(R.id.input_message);
@@ -143,27 +148,47 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), mLayoutManager.getOrientation()));
 
+        privileges = getIntent().getExtras().getString("privileges");
+
         myProgressDialog = new ProgressDialog(MainActivity.this);
         myProgressDialog.show();
         myProgressDialog.setContentView(R.layout.progress);
         ProgressBar progressBar = (ProgressBar) myProgressDialog.findViewById(R.id.progressBar);
+        final RelativeLayout layout = (RelativeLayout) myProgressDialog.findViewById(R.id.progress_layout);
+        final ProgressBar bar = (ProgressBar) myProgressDialog.findViewById(R.id.progressBar);
+        final ImageView image = (ImageView) myProgressDialog.findViewById(R.id.progress_image);
+        Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.zoom_in);
+        layout.startAnimation(anim);
+        image.startAnimation(anim);
+        bar.startAnimation(anim);
         progressBar.getIndeterminateDrawable()
                 .setColorFilter(Color.parseColor("#00FF00"), PorterDuff.Mode.MULTIPLY);
-        StringRequest request = new StringRequest(Request.Method.POST,uri,
+        StringRequest request = new StringRequest(Request.Method.POST,globalVariables.RETRIEVE_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        myDataset = PostJSONPaser.parseData(response);
-                            mAdapter = new MessageAdapter(getApplicationContext(), myDataset, mRecyclerView, mLayoutManager,empty,icon,icon_message);
-                            mRecyclerView.setAdapter(mAdapter);
-                            RelativeLayout layout = (RelativeLayout)myProgressDialog.findViewById(R.id.progress_layout);
-                            ProgressBar bar = (ProgressBar)myProgressDialog.findViewById(R.id.progressBar);
-                            ImageView image = (ImageView)myProgressDialog.findViewById(R.id.progress_image);
-                            Animation anim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fade_out);
-                            layout.startAnimation(anim);
-                            image.startAnimation(anim);
-                            bar.startAnimation(anim);
-                             myProgressDialog.dismiss();
+
+                            if(!response.equalsIgnoreCase("nodata")) {
+                                myDataset = PostJSONPaser.parseData(response);
+                                mAdapter = new MessageAdapter(getApplicationContext(), myDataset, mRecyclerView, mLayoutManager);
+                                mRecyclerView.setAdapter(mAdapter);
+                                Animation anim = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.zoom_out);
+                                layout.startAnimation(anim);
+                                image.startAnimation(anim);
+                                bar.startAnimation(anim);
+                                myProgressDialog.dismiss();
+                                mRecyclerView.setVisibility(View.VISIBLE);
+                                empty.setVisibility(View.GONE);
+                            }
+                            else
+                            {
+                                mRecyclerView.setVisibility(View.GONE);
+                                empty.setVisibility(View.VISIBLE);
+                                icon.setBackgroundResource(R.drawable.nomessages);
+                                icon_message.setText("No Messages To Show");
+                                myProgressDialog.dismiss();
+                            }
+
                     }
                 },
 
@@ -187,20 +212,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(getSupportActionBar().getTitle().toString().equalsIgnoreCase("messages")) {
-                    getSupportActionBar().setTitle("Documents");
-                    FragmentManager fragmentManager = getSupportFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.content_main, new Documents()).commit();
-                    fab.setImageResource(R.drawable.messages);
-                }
-                else
-                    if(getSupportActionBar().getTitle().toString().equalsIgnoreCase("documents"))
-                    {
-                        getSupportActionBar().setTitle("Messages");
-                        FragmentManager fragmentManager = getSupportFragmentManager();
-                        fragmentManager.beginTransaction().replace(R.id.content_main, new Messages()).commit();
-                        fab.setImageResource(R.drawable.doc);
-                    }
+
             }
         });
 
@@ -509,6 +521,14 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        if(privileges.equalsIgnoreCase("no"))
+        {
+            Menu menu =navigationView.getMenu();
+            MenuItem menuItem = menu.findItem(R.id.nav_register);
+            menuItem.setVisible(false);
+        }
+        fragmentManager = getSupportFragmentManager();
+
     }
 
     @Override
@@ -600,23 +620,17 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        FragmentManager fragmentManager = getSupportFragmentManager();
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
             getSupportActionBar().setTitle("Messages");
             fragmentManager.beginTransaction().replace(R.id.content_main, new Messages()).commit();
-            fab.setVisibility(View.VISIBLE);
-            fab.setImageResource(R.drawable.doc);
             // Handle the camera action
         } else if (id == R.id.nav_about) {
             getSupportActionBar().setTitle("Documents");
             fragmentManager.beginTransaction().replace(R.id.content_main, new Documents()).commit();
-            fab.setVisibility(View.VISIBLE);
-            fab.setImageResource(R.drawable.messages);
         }
         else if (id == R.id.nav_register) {
-            fab.setVisibility(View.GONE);
             getSupportActionBar().setTitle("New User");
             fragmentManager.beginTransaction().replace(R.id.content_main, new NewUser()).commit();
         }
@@ -747,6 +761,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(myReceiver);
+    }
+
+    @Override
     public void onClick(View view) {
         int id = view.getId();
         DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -798,8 +818,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void send() {
-        String insertUrl = "http://doe.payghost.co.za/scripts/register.php";
-        StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, globalVariables.REGISTER_DEVICE_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
             }
@@ -825,8 +844,7 @@ public class MainActivity extends AppCompatActivity
         int hours = dt.getHours();
         int minutes = dt.getMinutes();
         final String time = hours + ":" + minutes;
-        String insertUrl = "http://doe.payghost.co.za/scripts/upload.php";
-        StringRequest request = new StringRequest(Request.Method.POST, insertUrl, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, globalVariables.INSERT_POST_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 myProgressDialog.dismiss();
@@ -855,15 +873,15 @@ public class MainActivity extends AppCompatActivity
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(request);
     }
-
-    public void upload(String file,String titleMessage, String desc,String type) {
+    public void upload(String file, String titleMessage, String desc, String type) {
         Date dt = new Date();
         int hours = dt.getHours();
         int minutes = dt.getMinutes();
         String time = hours + ":" + minutes;
         try {
-            new MultipartUploadRequest(getApplicationContext(), UPLOAD_URL)
-                    .addFileToUpload(file, "uploaded_file")
+            if(!type.equalsIgnoreCase("video"))
+            new MultipartUploadRequest(getApplicationContext(),globalVariables.INSERT_POST_URL)
+                    .addFileToUpload(filepath.getPath().toString(), "uploaded_file")
                     .addParameter("subject",titleMessage)
                     .addParameter("message",desc)
                     .addParameter("attachment", "yes")
@@ -875,6 +893,20 @@ public class MainActivity extends AppCompatActivity
                     .setNotificationConfig(new UploadNotificationConfig())
                     .setMaxRetries(1)
                     .startUpload();
+            else
+                new MultipartUploadRequest(getApplicationContext(),globalVariables.INSERT_POST_URL)
+                        .addFileToUpload(file, "uploaded_file")
+                        .addParameter("subject",titleMessage)
+                        .addParameter("message",desc)
+                        .addParameter("attachment", "yes")
+                        .addParameter("type", type)
+                        .addParameter("urgent", urgentt)
+                        .addParameter("username",username)
+                        .addParameter("time", time)
+                        .setMethod("POST")
+                        .setNotificationConfig(new UploadNotificationConfig())
+                        .setMaxRetries(1)
+                        .startUpload();
         } catch (Exception ex) {
             Toast.makeText(getApplicationContext(),ex.getMessage().toString(),Toast.LENGTH_LONG).show();
         }
@@ -897,7 +929,6 @@ public class MainActivity extends AppCompatActivity
                 video_desc_hand.setVisibility(View.GONE);
                 btn_video_choose.setBackgroundResource(R.drawable.video_camera);
             }
-
     }
     public String getPath(Uri uri) {
         String[] projection = { MediaStore.Images.Media.DATA };
@@ -906,4 +937,17 @@ public class MainActivity extends AppCompatActivity
         cursor.moveToFirst();
         return cursor.getString(column_index);
     }
+    private BroadcastReceiver myReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Items items = new Items(intent.getExtras().getString("subject"),intent.getExtras().getString("date"),
+                    intent.getExtras().getString("message"),intent.getExtras().getString("attach"),
+                    intent.getExtras().getString("urgent"),intent.getExtras().getString("author"),
+                    intent.getExtras().getString("link"),intent.getExtras().getString("filename"));
+            Toast.makeText(context,intent.getExtras().getString("subject"),Toast.LENGTH_LONG).show();
+            myDataset.add(items);
+           // mAdapter.notifyItemInserted(0);
+            mRecyclerView.smoothScrollToPosition(0);
+        }
+    };
 }

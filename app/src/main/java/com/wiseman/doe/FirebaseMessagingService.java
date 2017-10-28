@@ -12,6 +12,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService
 {
+    public static final String INTENT_FILTER = "INTENT_FILTER";
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage)
     {
@@ -45,17 +46,25 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         {
             e.printStackTrace();
         }
+        Intent intent = new Intent(INTENT_FILTER);
+        intent.putExtra("subject",subject);
+        intent.putExtra("date",date);
+        intent.putExtra("message",message);
+        intent.putExtra("attach",attach);
+        intent.putExtra("urgent",urgent);
+        intent.putExtra("author",author);
+        intent.putExtra("link",link);
+        intent.putExtra("filename",filename);
+        sendBroadcast(intent);
     }
     private void showNotification(String message, String subject)
     {
             Intent in = new Intent(this,Login.class);
             in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this,0,in, PendingIntent.FLAG_UPDATE_CURRENT);
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.iconn).setContentIntent(pendingIntent);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setAutoCancel(true).setContentTitle(subject).setContentText(message).setSmallIcon(R.drawable.iconncopy).setContentIntent(pendingIntent);
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             manager.notify(0,builder.build());
-
     }
-
 
 }

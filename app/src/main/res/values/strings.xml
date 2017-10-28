@@ -4,7 +4,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="ads_unit_id"> ca-app-pub-4346858439090798/2246800263/</string>
-
+    <string name="disclaimer"> By granting the user privileges, You allow him to register new users. Continue?</string>
     <!-- TODO: Remove or change this placeholder text -->
 
     <string-array name ="urgent">

@@ -1,23 +1,22 @@
 package com.wiseman.doe;
 
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
-import android.os.Build;
-import android.support.design.widget.FloatingActionButton;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Wiseman on 2017-10-02.
@@ -27,20 +26,15 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosHolder> {
     List<Items> mDataset;
     Context context,c;
     RecyclerView recyclerView;
-    FloatingActionButton fab;
     RecyclerView.LayoutManager layoutManager;
-    String video_duration="";
-    LinearLayout empty;
-    TextView icon,icon_message;
-    int count=0;
-    public VideosAdapter(Context context, List<Items> mDataset, RecyclerView recyclerView, RecyclerView.LayoutManager layoutManager, LinearLayout empty,TextView icon,TextView iconMessage) {
+    Animation upAnim;
+    ProgressDialog myProgressDialog;
+    public VideosAdapter(Context context, List<Items> mDataset, RecyclerView recyclerView, RecyclerView.LayoutManager layoutManager,ProgressDialog myProgressDialog) {
         this.mDataset = mDataset;
         this.context=context;
         this.recyclerView = recyclerView;
         this.layoutManager = layoutManager;
-        this.empty = empty;
-        this.icon=icon;
-        this.icon_message = iconMessage;
+        this.myProgressDialog = myProgressDialog;
     }
     @Override
     public VideosHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -61,76 +55,46 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosHolder> {
             holder.subject.setText("" + mDataset.get(position).getSubject());
             holder.link.setText(mDataset.get(position).getLink());
             holder.filename.setText(mDataset.get(position).getFilename());
-            holder.video_thumbnail.setImageBitmap(getVideoThumbnail(mDataset.get(position).getLink()));
-            holder.video_duration.setText(""+video_duration);
+            holder.video_thumbnail.setImageBitmap(mDataset.get(position).getImage());
+            holder.video_duration.setText(mDataset.get(position).getDuration());
             holder.play.getBackground().setAlpha(150);
-            holder.duration.getBackground().setAlpha(150);
-            final Animation upAnim = AnimationUtils.loadAnimation(context, R.anim.fromtop_translation);
+            holder.video_footer.getBackground().setAlpha(180);
+            upAnim = AnimationUtils.loadAnimation(context, R.anim.fromtop_translation);
             holder.itemView.clearAnimation();
             holder.itemView.startAnimation(upAnim);
-            count++;
-        }
-        if(count>0)
-        {
-            recyclerView.setVisibility(View.VISIBLE);
-            empty.setVisibility(View.GONE);
-        }
-        else
-        {
-            recyclerView.setVisibility(View.GONE);
-            empty.setVisibility(View.VISIBLE);
-            icon.setBackgroundResource(R.drawable.novideos);
-            icon_message.setText("No Videos To Show");
+            holder.play.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    upAnim = AnimationUtils.loadAnimation(context, R.anim.alpha);
+                    holder.play.startAnimation(upAnim);
+                    ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                    boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+                    if(isConnected)
+                    {
+                        String url = holder.link.getText()+"";
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        context.startActivity(browserIntent);
+                    }
+                    else
+                    {
+                        LayoutInflater infla = LayoutInflater.from(holder.itemView.getContext());
+                        View layout =infla.inflate(R.layout.toast_container_layout,(ViewGroup)holder.itemView.findViewById(R.id.toast_layout));
+                        TextView textview = (TextView)layout.findViewById(R.id.toast_message);
+                        textview.setText("No Internet Connection!");
+                        Toast toast = new Toast(context);
+                        toast.setGravity(Gravity.CENTER_VERTICAL,0,0);
+                        toast.setDuration(Toast.LENGTH_LONG);
+                        toast.setView(layout);
+                        toast.show();
+                    }
+                }
+            });
         }
     }
     @Override
     public int getItemCount() {
         return mDataset.size();
     }
-    public Bitmap getVideoThumbnail(String videoPath)
-    {
-        Bitmap bitmap = null;
-        MediaMetadataRetriever mediaMetadataRetriever = null;
-        try
-        {
-            mediaMetadataRetriever = new MediaMetadataRetriever();
-            if (Build.VERSION.SDK_INT >= 14) {
-                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
-                String time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                int duration = Integer.parseInt(time);
-                video_duration = String.format("0%d:0%d",
-                        TimeUnit.MILLISECONDS.toMinutes(duration),
-                        TimeUnit.MILLISECONDS.toSeconds(duration) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-                );
 
-            }
-            else {
-                mediaMetadataRetriever.setDataSource(videoPath);
-                //   mediaMetadataRetriever.setDataSource(videoPath);
-                String time = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                int duration = Integer.parseInt(time);
-                video_duration = String.format("%d0:0%d",
-                        TimeUnit.MILLISECONDS.toMinutes(duration),
-                        TimeUnit.MILLISECONDS.toSeconds(duration) -
-                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(duration))
-                );
-            }
-            bitmap = mediaMetadataRetriever.getFrameAtTime();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
-
-        }
-        finally
-        {
-            if (mediaMetadataRetriever != null)
-            {
-                mediaMetadataRetriever.release();
-            }
-        }
-        return bitmap;
-    }
 }

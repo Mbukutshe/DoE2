@@ -19,6 +19,8 @@
         android:background="@drawable/side_background"
         android:layout_gravity="start"
         android:scrollbars="none"
+        app:itemIconTint="#A5A5A5"
+        app:itemBackground="@android:color/transparent"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer">

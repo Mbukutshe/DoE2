@@ -5,50 +5,107 @@
     android:id="@+id/card_view_videos"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardElevation="0dp"
-    card_view:cardCornerRadius="20dp"
+    card_view:cardElevation="5dp"
+    card_view:cardCornerRadius="5dp"
     card_view:cardPreventCornerOverlap="false"
-    card_view:contentPaddingLeft="@dimen/activity_horizontal_margin"
-    card_view:contentPaddingRight="@dimen/activity_horizontal_margin"
+    card_view:contentPaddingLeft="0dp"
+    card_view:contentPaddingRight="0dp"
     card_view:contentPaddingTop="@dimen/activity_horizontal_margin"
+    card_view:contentPaddingBottom="0dp"
     card_view:theme="@style/AlertDialog.AppCompat">
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/messages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true">
-        <FrameLayout
+        android:orientation="vertical">
+        <LinearLayout
             android:id="@+id/title_message"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:gravity="center"
-            android:paddingLeft="2dp"
-            android:paddingBottom="2dp">
-            <TextView
-                android:id="@+id/subject_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/time_message"
-                android:gravity="center"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_alignParentLeft="true"
-                android:text="Subject:"
-                android:layout_weight="1"
-                android:textAppearance="@style/Subject"
-                />
-            <TextView
-                android:id="@+id/time_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:gravity="center"
-                android:layout_toRightOf="@+id/info_text_message"
-                android:layout_alignParentRight="true"
-                android:textColor="@color/menuColor"
-                android:text="Time"/>
-        </FrameLayout>
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_height="wrap_content">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:padding="5dp"
+                android:layout_height="wrap_content">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:gravity="center"
+                    android:paddingBottom="2dp">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/profilepic"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:background="@drawable/profilepic"
+                            android:layout_marginTop="2dp"
+                            android:layout_toLeftOf="@+id/author_message"
+                            android:layout_gravity="start|bottom"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"/>
+                        <TextView
+                            android:id="@+id/author_message"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_toRightOf="@+id/profilepic"
+                            android:layout_gravity="bottom"
+                            android:paddingLeft="5dp"
+                            android:text=""
+                            android:layout_weight="1"
+                            android:textAppearance="@style/sender_style"/>
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/time_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:gravity="center"
+                        android:layout_toRightOf="@+id/info_text_message"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@color/menuColor"
+                        android:text="Time"/>
+                </FrameLayout>
+            </FrameLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/subject_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|left"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_alignParentLeft="true"
+                    android:text="Subject:"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/Subject"
+                    />
+                <TextView
+                    android:id="@+id/message_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:text=""
+                    android:textColor="@color/menuColor"
+                    android:textSize="7pt"
+                    android:maxLines="5"
+                    android:ellipsize="end"/>
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
             android:id="@+id/message_layout_message"
@@ -56,18 +113,23 @@
             android:layout_below="@+id/title_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="2dp">
+            android:paddingLeft="0dp">
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/video_thumbnail"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scaleType="centerCrop"
                     android:adjustViewBounds="true"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"/>
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/play_white_stroke"
+                    android:layout_height="wrap_content">
                 <FrameLayout
                     android:id="@+id/play_video_layout"
                     android:layout_width="wrap_content"
@@ -82,63 +144,38 @@
                         android:layout_gravity="center"
                         android:background="@drawable/playvideo"/>
                 </FrameLayout>
-                <FrameLayout
-                    android:id="@+id/video_duration_layout"
-                    android:layout_width="wrap_content"
-                    android:background="@drawable/textview_duration_corners"
-                    android:layout_gravity="end|bottom"
-                    android:layout_margin="10dp"
-                    android:gravity="center"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/video_duration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="03:02"
-                        android:textColor="#fff"/>
                 </FrameLayout>
+                <LinearLayout
+                    android:id="@+id/video_footer_layout"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/textview_duration_corners"
+                    android:layout_margin="10dp"
+                    android:layout_height="wrap_content">
+                    <FrameLayout
+                        android:id="@+id/video_duration_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/video_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="03:02"
+                            android:textColor="#fff"/>
+                    </FrameLayout>
+
+                </LinearLayout>
             </FrameLayout>
-            <TextView
-                android:id="@+id/message_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:text=""
-                android:textColor="@color/menuColor"
-                android:layout_toLeftOf="@+id/urgent"
-                android:paddingRight="50dp"
-                android:maxLines="1"
-                android:ellipsize="end"/>
         </LinearLayout>
         <FrameLayout
             android:id="@+id/author_layout_message"
-            android:layout_marginTop="10dp"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_below="@+id/message_layout_message"
-            android:paddingLeft="2dp">
-            android:layout_marginBottom="0dp">
-            <TextView
-                android:id="@+id/profilepic"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/profilepic"
-                android:layout_marginTop="2dp"
-                android:layout_toLeftOf="@+id/author_message"
-                android:layout_gravity="start"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
-            <TextView
-                android:id="@+id/author_message"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginLeft="30dp"
-                android:layout_alignParentRight="true"
-                android:layout_toRightOf="@+id/profilepic"
-                android:text=""
-                android:layout_weight="1"
-                android:textAppearance="@style/sender_style"/>
+            android:layout_below="@+id/message_layout_message">
             <TextView
                 android:id="@+id/urgent_text"
                 android:layout_width="0dp"
@@ -162,5 +199,5 @@
                 android:layout_height="0dp"
                 android:layout_alignParentRight="true"/>
         </FrameLayout>
-    </RelativeLayout>
+    </LinearLayout>
 </android.support.v7.widget.CardView>

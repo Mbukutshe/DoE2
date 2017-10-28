@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +38,6 @@ import java.util.Map;
 
 public class Videos extends Fragment{
     View view;
-    String uri = "http://doe.payghost.co.za/scripts/retrieve.php";
     List<Items> myDataset;
     RequestQueue requestQueue;
     ProgressDialog myProgressDialog;
@@ -63,31 +61,44 @@ public class Videos extends Fragment{
         }
         else
         {
-            mLayoutManager = new StaggeredGridLayoutManager(2,1);
+           // mLayoutManager = new StaggeredGridLayoutManager(2,1);
+            mLayoutManager = new LinearLayoutManager(this.getContext());
         }
         mRecyclerView.setLayoutManager(mLayoutManager);
         myProgressDialog = new ProgressDialog(view.getContext());
         myProgressDialog.show();
         myProgressDialog.setContentView(R.layout.progress);
         ProgressBar progressBar = (ProgressBar) myProgressDialog.findViewById(R.id.progressBar);
-        progressBar.getIndeterminateDrawable()
-                .setColorFilter(Color.parseColor("#00FF00"), PorterDuff.Mode.MULTIPLY);
-        StringRequest request = new StringRequest(Request.Method.POST,uri,
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.parseColor("#00FF00"),PorterDuff.Mode.MULTIPLY);
+        StringRequest request = new StringRequest(Request.Method.POST,globalVariables.RETRIEVE_URL,
 
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        myDataset = PostJSONPaser.parseData(response);
-                        mAdapter = new VideosAdapter(view.getContext(), myDataset, mRecyclerView, mLayoutManager,empty,icon,icon_message);
-                        mRecyclerView.setAdapter(mAdapter);
-                        RelativeLayout layout = (RelativeLayout)myProgressDialog.findViewById(R.id.progress_layout);
-                        ProgressBar bar = (ProgressBar)myProgressDialog.findViewById(R.id.progressBar);
-                        ImageView image = (ImageView)myProgressDialog.findViewById(R.id.progress_image);
-                        Animation anim = AnimationUtils.loadAnimation(view.getContext(),R.anim.fade_out);
-                        layout.startAnimation(anim);
-                        image.startAnimation(anim);
-                        bar.startAnimation(anim);
-                        myProgressDialog.dismiss();
+                            if(!response.equalsIgnoreCase("nodata"))
+                            {
+                                myDataset = VideoThumbnail.parseData(response);
+                                mAdapter = new VideosAdapter(view.getContext(), myDataset, mRecyclerView, mLayoutManager,myProgressDialog);
+                                mRecyclerView.setAdapter(mAdapter);
+                                RelativeLayout layout = (RelativeLayout)myProgressDialog.findViewById(R.id.progress_layout);
+                                ProgressBar bar = (ProgressBar)myProgressDialog.findViewById(R.id.progressBar);
+                                ImageView image = (ImageView)myProgressDialog.findViewById(R.id.progress_image);
+                                Animation anim = AnimationUtils.loadAnimation(view.getContext(),R.anim.zoom_out);
+                                layout.startAnimation(anim);
+                                image.startAnimation(anim);
+                                bar.startAnimation(anim);
+                                myProgressDialog.dismiss();
+                                mRecyclerView.setVisibility(View.VISIBLE);
+                                empty.setVisibility(View.GONE);
+                            }
+                            else
+                            {
+                                mRecyclerView.setVisibility(View.GONE);
+                                empty.setVisibility(View.VISIBLE);
+                                icon.setBackgroundResource(R.drawable.novideos);
+                                icon_message.setText("No Videos To Show");
+                                myProgressDialog.dismiss();
+                            }
                     }
                 },
 
